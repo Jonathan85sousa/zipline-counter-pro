@@ -25,15 +25,35 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ records, operatorNam
         throw new Error('Elemento de resumo não encontrado');
       }
 
-      // Configurações para melhor qualidade da imagem
+      // Aguardar um breve momento para garantir que o DOM está renderizado
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Configurações otimizadas para melhor qualidade e sem cortes
       const canvas = await html2canvas(element, {
         backgroundColor: '#ffffff',
         scale: 2,
         logging: false,
         useCORS: true,
         allowTaint: true,
+        scrollX: 0,
+        scrollY: 0,
+        width: element.scrollWidth,
         height: element.scrollHeight,
-        width: element.scrollWidth
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+        // Garantir que toda a área seja capturada
+        x: 0,
+        y: 0,
+        // Adicionar padding para evitar cortes
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('summary-export');
+          if (clonedElement) {
+            clonedElement.style.padding = '20px';
+            clonedElement.style.margin = '0';
+            clonedElement.style.transform = 'none';
+            clonedElement.style.maxWidth = 'none';
+          }
+        }
       });
 
       // Converter canvas para blob e fazer download
