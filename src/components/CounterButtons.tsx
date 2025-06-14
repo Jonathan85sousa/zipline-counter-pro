@@ -21,16 +21,7 @@ export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, tod
 
   return (
     <div className="space-y-6">
-      {/* Título Principal do Contador */}
       <div className="text-center mb-8">
-        <div className="bg-gradient-to-r from-primary to-blue-600 text-primary-foreground rounded-2xl p-6 shadow-xl mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2">
-            🎯 CONTADOR DE DESCIDAS
-          </h1>
-          <p className="text-xl opacity-90">
-            Sistema de Controle da Tirolesa
-          </p>
-        </div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
           Registrar Nova Descida
         </h2>

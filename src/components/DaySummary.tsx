@@ -59,14 +59,9 @@ export const DaySummary: React.FC<DaySummaryProps> = ({ records, operatorName })
   return (
     <div id="summary-export" className="space-y-6 max-w-4xl mx-auto bg-background p-6 rounded-lg">
       <div className="text-center mb-8">
-        <div className="bg-gradient-to-r from-primary to-blue-600 text-primary-foreground rounded-2xl p-6 shadow-xl mb-4">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-            🎯 CONTADOR DE DESCIDAS
-          </h1>
-          <h2 className="text-xl sm:text-2xl font-semibold">
-            📊 Resumo do Dia
-          </h2>
-        </div>
+        <h2 className="text-3xl font-bold text-foreground mb-4">
+          📊 Resumo do Dia
+        </h2>
         <p className="text-lg text-muted-foreground">
           {new Date().toLocaleDateString('pt-BR', { 
             weekday: 'long', 
