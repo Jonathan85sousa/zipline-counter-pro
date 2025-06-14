@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ operatorName, setOperatorName, o
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold text-primary">
-              🏔️ Tirolesa Counter
+              🏔️ Contador de Descidas
             </h1>
             <p className="text-muted-foreground">
               {new Date().toLocaleDateString('pt-BR', { 
