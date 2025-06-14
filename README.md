@@ -1,73 +1,257 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🏔️ Contador de Descidas de Tirolesa
 
-**URL**: https://lovable.dev/projects/6f99f441-6b69-4efc-ade7-0cc3462761fc
+Sistema para contagem e gerenciamento de descidas de tirolesa desenvolvido em **HTML, CSS e JavaScript puro**.
 
-## How can I edit this code?
+## 📋 Funcionalidades
 
-There are several ways of editing your application.
+### ✅ Principais
+- **Contador de Descidas**: Registro por tipo de cadeirinha (B, T0, T1, T2)
+- **Histórico Detalhado**: Visualização de todas as descidas do dia
+- **Resumo Estatístico**: Gráficos e métricas completas
+- **Exportação PNG**: Download do resumo como imagem
+- **Persistência Local**: Dados salvos no navegador
 
-**Use Lovable**
+### 🎨 Interface
+- **Design Responsivo**: Funciona em desktop e mobile
+- **Animações Suaves**: Feedback visual para todas as ações
+- **Cores Intuitivas**: Sistema de cores por tipo de cadeirinha
+- **Navegação por Tabs**: Interface organizada e limpa
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6f99f441-6b69-4efc-ade7-0cc3462761fc) and start prompting.
+## 🚀 Como Usar
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📦 Instalação
+1. Baixe os arquivos do projeto
+2. Abra o arquivo `index.html` em qualquer navegador
+3. Pronto! O sistema está funcionando
 
-**Use your preferred IDE**
+### 🖱️ Operação Básica
+1. **Digite o nome do operador** no campo no cabeçalho
+2. **Clique nos botões coloridos** para registrar descidas:
+   - 🟢 **Verde**: Cadeirinha B
+   - 🔵 **Azul**: Cadeirinha T0  
+   - 🟡 **Amarelo**: Cadeirinha T1
+   - 🔴 **Vermelho**: Cadeirinha T2
+3. **Navegue pelas abas** para ver histórico e resumo
+4. **Exporte o resumo** como imagem PNG
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### ⌨️ Atalhos de Teclado
+- **1**: Adicionar Cadeirinha B
+- **2**: Adicionar Cadeirinha T0
+- **3**: Adicionar Cadeirinha T1
+- **4**: Adicionar Cadeirinha T2
+- **ESC**: Fechar modal
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📁 Estrutura do Projeto
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+projeto/
+├── index.html          # Estrutura principal da aplicação
+├── styles.css          # Estilos e design responsivo
+├── script.js           # Lógica e funcionalidades
+└── README.md           # Documentação
 ```
 
-**Edit a file directly in GitHub**
+## 🛠️ Tecnologias
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **HTML5**: Estrutura semântica
+- **CSS3**: Design responsivo com Grid/Flexbox
+- **JavaScript ES6+**: Lógica da aplicação
+- **LocalStorage**: Persistência de dados
+- **Web APIs**: Exportação de imagens
 
-**Use GitHub Codespaces**
+## 📊 Recursos do Sistema
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 🔢 Contador
+- Botões grandes e visuais para cada tipo
+- Contadores em tempo real
+- Feedback visual nas interações
+- Totais diários consolidados
 
-## What technologies are used for this project?
+### 📋 Histórico
+- Lista cronológica de todas as descidas
+- Horário preciso de cada registro
+- Possibilidade de excluir registros individuais
+- Numeração sequencial das descidas
 
-This project is built with:
+### 📈 Resumo
+- Total geral de descidas
+- Breakdown por tipo de cadeirinha
+- Primeira e última descida do dia
+- Gráfico de descidas por hora
+- Informações do operador
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### 💾 Exportação
+- Geração de imagem PNG do resumo
+- Nome automático com data e operador
+- Download direto pelo navegador
+- Qualidade otimizada para impressão
 
-## How can I deploy this project?
+## 🎨 Sistema de Cores
 
-Simply open [Lovable](https://lovable.dev/projects/6f99f441-6b69-4efc-ade7-0cc3462761fc) and click on Share -> Publish.
+| Tipo | Cor | Código | Uso |
+|------|-----|--------|-----|
+| B | Verde | `#10b981` | Cadeirinha tipo B |
+| T0 | Azul | `#3b82f6` | Cadeirinha tipo T0 |
+| T1 | Amarelo | `#f59e0b` | Cadeirinha tipo T1 |
+| T2 | Vermelho | `#ef4444` | Cadeirinha tipo T2 |
 
-## Can I connect a custom domain to my Lovable project?
+## 📱 Responsividade
 
-Yes, you can!
+### 💻 Desktop (1200px+)
+- Layout em grade com 4 colunas
+- Sidebar com totais
+- Navegação horizontal
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### 📱 Tablet (768px - 1199px)
+- Layout em 2 colunas
+- Navegação adaptada
+- Controles reorganizados
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### 📱 Mobile (< 768px)
+- Layout em coluna única
+- Botões empilhados
+- Interface otimizada para toque
+
+## 💾 Armazenamento de Dados
+
+### 🗄️ LocalStorage
+Os dados são salvos localmente no navegador usando as chaves:
+
+```javascript
+// Registros de descidas
+localStorage.setItem('tirolesa-records', JSON.stringify(records));
+
+// Nome do operador
+localStorage.setItem('operator-name', operatorName);
+```
+
+### 📋 Estrutura de Dados
+```javascript
+// Registro individual
+{
+  id: "1639123456789",           // Timestamp único
+  type: "B",                     // Tipo: B, T0, T1, T2
+  timestamp: "2023-12-10T14:30:00.000Z"  // Data/hora ISO
+}
+```
+
+## 🔧 Funcionalidades Técnicas
+
+### 🏗️ Arquitetura
+- **Classe Principal**: `TirolesaCounter` centraliza toda a lógica
+- **Event-Driven**: Sistema baseado em eventos do DOM
+- **State Management**: Estado centralizado na classe
+- **Modular**: Funções separadas por responsabilidade
+
+### ⚡ Performance
+- **Lazy Loading**: Carregamento sob demanda
+- **Event Delegation**: Otimização de eventos
+- **Debounce**: Prevenção de spam em inputs
+- **Caching**: Cache de elementos DOM
+
+### 🛡️ Tratamento de Erros
+```javascript
+// Tratamento global de erros
+window.addEventListener('error', function(event) {
+    console.error('Erro na aplicação:', event.error);
+});
+
+// Tratamento de promises
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('Promise rejeitada:', event.reason);
+});
+```
+
+## 🌐 Compatibilidade
+
+### ✅ Navegadores Suportados
+- **Chrome/Edge**: 60+
+- **Firefox**: 55+
+- **Safari**: 12+
+- **Mobile**: iOS Safari 12+, Android Chrome 60+
+
+### 📋 Recursos Necessários
+- **LocalStorage**: Para persistência de dados
+- **ES6+ Support**: Arrow functions, classes, etc.
+- **CSS Grid/Flexbox**: Para layout responsivo
+- **Canvas API**: Para exportação de imagens (futuro)
+
+## 🚀 Deploy
+
+### 📁 Hospedagem Estática
+O projeto pode ser hospedado em qualquer servidor de arquivos estáticos:
+
+- **GitHub Pages**
+- **Netlify** 
+- **Vercel**
+- **Firebase Hosting**
+- **Servidor Apache/Nginx**
+
+### 🔧 Configuração
+1. Faça upload dos arquivos para o servidor
+2. Certifique-se que `index.html` está na raiz
+3. Configure HTTPS para melhor segurança
+4. Opcional: Configure Service Worker para uso offline
+
+## 🔮 Futuras Melhorias
+
+### 📈 Funcionalidades
+- [ ] Backup/restore de dados
+- [ ] Relatórios mensais/anuais
+- [ ] Múltiplos operadores
+- [ ] Sincronização em nuvem
+- [ ] Modo offline completo
+
+### 🎨 Interface
+- [ ] Temas customizáveis
+- [ ] Modo escuro/claro
+- [ ] Animações avançadas
+- [ ] PWA (Progressive Web App)
+- [ ] Notificações push
+
+### 📊 Analytics
+- [ ] Métricas de performance
+- [ ] Relatórios de uso
+- [ ] Dashboards avançados
+- [ ] Exportação para Excel/PDF
+
+## 👨‍💻 Desenvolvimento
+
+### 🏃‍♂️ Como Contribuir
+1. Fork o projeto
+2. Crie uma branch para sua feature
+3. Implemente as mudanças
+4. Teste em diferentes navegadores
+5. Abra um Pull Request
+
+### 🧪 Testes
+```bash
+# Abrir em servidor local (opcional)
+python -m http.server 8000
+# ou
+npx serve .
+```
+
+### 📝 Padrões de Código
+- **Indentação**: 4 espaços
+- **Naming**: camelCase para JS, kebab-case para CSS
+- **Comentários**: Documentação detalhada
+- **Semântica**: HTML5 semântico
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## 📞 Suporte
+
+Para dúvidas, sugestões ou problemas:
+- Abra uma issue no repositório
+- Envie um email para suporte@exemplo.com
+- Consulte a documentação técnica no código
+
+---
+
+**Desenvolvido com ❤️ para operadores de tirolesa**
+
+🏔️ *Sistema robusto, simples e eficiente para o dia a dia da operação*
