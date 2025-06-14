@@ -1,137 +1,127 @@
 
 /*
-SISTEMA DE CONTAGEM DE DESCIDAS DE TIROLESA
-============================================
+SISTEMA DE CONTAGEM DE DESCIDAS DE TIROLESA - HTML/CSS/JS PURO
+============================================================
+
+Este sistema permite registrar e gerenciar descidas de tirolesa por tipo de cadeirinha.
+Desenvolvido em HTML, CSS e JavaScript puro para máxima compatibilidade.
+
+FUNCIONALIDADES:
+- Contador de descidas por tipo (B, T0, T1, T2)
+- Histórico detalhado com horários
+- Resumo estatístico
+- Persistência local (localStorage)
+- Interface responsiva
+- Sistema de notificações
 
 ESTRUTURA DE DADOS:
-- Cada descida é um objeto com: id, type, timestamp
-- Os dados são salvos no localStorage
-- Interface com 3 tabs: Contador, Histórico, Resumo
-
-FUNCIONALIDADES PRINCIPAIS:
-1. Adicionar registros de descida por tipo (B, T0, T1, T2)
-2. Visualizar histórico com possibilidade de exclusão
-3. Gerar resumo detalhado com estatísticas
-4. Exportar resumo como imagem PNG
-5. Persistir dados no localStorage
-6. Interface responsiva
-
-PADRÃO DE CORES:
-- Verde (#10b981): Cadeirinha B
-- Azul (#3b82f6): Cadeirinha T0  
-- Amarelo (#f59e0b): Cadeirinha T1
-- Vermelho (#ef4444): Cadeirinha T2
+- Record: { id: timestamp, type: string, timestamp: ISO date }
+- Armazenamento: localStorage
 */
 
-// ============================
-// GERENCIAMENTO DE ESTADO
-// ============================
+// ======================
+// VARIÁVEIS GLOBAIS
+// ======================
+let records = [];
+let operatorName = '';
+let activeTab = 'counter';
+let modalCallback = null;
 
-class TirolesaCounter {
-    constructor() {
-        // Inicializar propriedades
-        this.records = this.loadRecords();
-        this.operatorName = this.loadOperatorName();
-        this.activeTab = 'counter';
+// ======================
+// INICIALIZAÇÃO
+// ======================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🏔️ Inicializando Contador de Descidas');
+    initializeApp();
+});
+
+function initializeApp() {
+    loadData();
+    updateCurrentDate();
+    bindEvents();
+    updateDisplay();
+    console.log('✅ Aplicação inicializada com sucesso!');
+}
+
+// ======================
+// GERENCIAMENTO DE DADOS
+// ======================
+function loadData() {
+    try {
+        const storedRecords = localStorage.getItem('tirolesa-records');
+        records = storedRecords ? JSON.parse(storedRecords) : [];
         
-        // Inicializar interface
-        this.initializeApp();
-        this.bindEvents();
-        this.updateDisplay();
-    }
-
-    // Carregar registros do localStorage
-    loadRecords() {
-        try {
-            const stored = localStorage.getItem('tirolesa-records');
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Erro ao carregar registros:', error);
-            return [];
-        }
-    }
-
-    // Salvar registros no localStorage
-    saveRecords() {
-        try {
-            localStorage.setItem('tirolesa-records', JSON.stringify(this.records));
-        } catch (error) {
-            console.error('Erro ao salvar registros:', error);
-        }
-    }
-
-    // Carregar nome do operador
-    loadOperatorName() {
-        return localStorage.getItem('operator-name') || '';
-    }
-
-    // Salvar nome do operador
-    saveOperatorName(name) {
-        this.operatorName = name;
-        localStorage.setItem('operator-name', name);
-    }
-
-    // Obter registros do dia atual
-    getTodayRecords() {
-        const today = new Date().toDateString();
-        return this.records.filter(record => {
-            const recordDate = new Date(record.timestamp).toDateString();
-            return recordDate === today;
-        });
-    }
-
-    // Adicionar novo registro
-    addRecord(type) {
-        const newRecord = {
-            id: Date.now().toString(),
-            type: type,
-            timestamp: new Date().toISOString()
-        };
+        const storedOperator = localStorage.getItem('operator-name');
+        operatorName = storedOperator || '';
         
-        this.records.push(newRecord);
-        this.saveRecords();
-        this.updateDisplay();
-        
-        // Adicionar feedback visual
-        this.showNotification(`Descida ${type} registrada!`);
-    }
-
-    // Excluir registro
-    deleteRecord(id) {
-        this.records = this.records.filter(record => record.id !== id);
-        this.saveRecords();
-        this.updateDisplay();
-        this.showNotification('Registro excluído!');
-    }
-
-    // Limpar todos os registros
-    clearAllRecords() {
-        this.showConfirmModal(
-            'Tem certeza que deseja zerar todas as contagens? Esta ação não pode ser desfeita.',
-            () => {
-                this.records = [];
-                this.saveRecords();
-                this.updateDisplay();
-                this.showNotification('Todos os registros foram limpos!');
-            }
-        );
+        document.getElementById('operatorName').value = operatorName;
+    } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        records = [];
+        operatorName = '';
     }
 }
 
-// ============================
-// INICIALIZAÇÃO DA INTERFACE
-// ============================
+function saveRecords() {
+    try {
+        localStorage.setItem('tirolesa-records', JSON.stringify(records));
+    } catch (error) {
+        console.error('Erro ao salvar registros:', error);
+    }
+}
 
-TirolesaCounter.prototype.initializeApp = function() {
-    // Definir data atual no header
-    this.updateCurrentDate();
+function saveOperatorName(name) {
+    operatorName = name;
+    localStorage.setItem('operator-name', name);
+}
+
+function getTodayRecords() {
+    const today = new Date().toDateString();
+    return records.filter(record => {
+        const recordDate = new Date(record.timestamp).toDateString();
+        return recordDate === today;
+    });
+}
+
+// ======================
+// FUNÇÕES PRINCIPAIS
+// ======================
+function addRecord(type) {
+    const newRecord = {
+        id: Date.now().toString(),
+        type: type,
+        timestamp: new Date().toISOString()
+    };
     
-    // Definir nome do operador
-    const operatorInput = document.getElementById('operatorName');
-    operatorInput.value = this.operatorName;
-};
+    records.push(newRecord);
+    saveRecords();
+    updateDisplay();
+    showNotification(`Descida ${type} registrada!`);
+}
 
-TirolesaCounter.prototype.updateCurrentDate = function() {
+function deleteRecord(id) {
+    records = records.filter(record => record.id !== id);
+    saveRecords();
+    updateDisplay();
+    showNotification('Registro excluído!');
+}
+
+function clearAllRecords() {
+    showConfirmModal(
+        'Tem certeza que deseja zerar todas as contagens? Esta ação não pode ser desfeita.',
+        function() {
+            records = [];
+            saveRecords();
+            updateDisplay();
+            showNotification('Todos os registros foram limpos!');
+        }
+    );
+}
+
+// ======================
+// INTERFACE E EVENTOS
+// ======================
+function updateCurrentDate() {
     const dateElement = document.getElementById('currentDate');
     const options = { 
         weekday: 'long', 
@@ -141,178 +131,162 @@ TirolesaCounter.prototype.updateCurrentDate = function() {
     };
     const currentDate = new Date().toLocaleDateString('pt-BR', options);
     dateElement.textContent = currentDate;
-};
+}
 
-// ============================
-// BINDING DE EVENTOS
-// ============================
-
-TirolesaCounter.prototype.bindEvents = function() {
+function bindEvents() {
     // Eventos dos botões de contador
-    document.querySelectorAll('.counter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.counter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             const type = e.currentTarget.dataset.type;
-            this.addRecord(type);
+            addRecord(type);
             
             // Animação de feedback
             e.currentTarget.style.transform = 'scale(0.95)';
-            setTimeout(() => {
+            setTimeout(function() {
                 e.currentTarget.style.transform = '';
             }, 150);
         });
     });
 
-    // Eventos das tabs de navegação
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // Eventos das tabs
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             const tab = e.currentTarget.dataset.tab;
-            this.switchTab(tab);
+            switchTab(tab);
         });
     });
 
-    // Evento do campo nome do operador
-    document.getElementById('operatorName').addEventListener('input', (e) => {
-        this.saveOperatorName(e.target.value);
+    // Campo nome do operador
+    document.getElementById('operatorName').addEventListener('input', function(e) {
+        saveOperatorName(e.target.value);
     });
 
-    // Evento do botão limpar tudo
-    document.getElementById('clearAllBtn').addEventListener('click', () => {
-        this.clearAllRecords();
+    // Botão limpar tudo
+    document.getElementById('clearAllBtn').addEventListener('click', function() {
+        clearAllRecords();
     });
 
-    // Evento do botão exportar
-    document.getElementById('exportBtn').addEventListener('click', () => {
-        this.exportSummaryAsImage();
+    // Botão exportar
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        exportSummaryAsImage();
     });
 
     // Eventos do modal
-    document.getElementById('modalCancel').addEventListener('click', () => {
-        this.hideModal();
+    document.getElementById('modalCancel').addEventListener('click', function() {
+        hideModal();
     });
 
-    document.getElementById('modalConfirm').addEventListener('click', () => {
-        if (this.modalCallback) {
-            this.modalCallback();
+    document.getElementById('modalConfirm').addEventListener('click', function() {
+        if (modalCallback) {
+            modalCallback();
         }
-        this.hideModal();
+        hideModal();
     });
 
-    // Fechar modal clicando fora
-    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
         if (e.target === e.currentTarget) {
-            this.hideModal();
+            hideModal();
         }
     });
 
-    // Eventos de teclado
-    document.addEventListener('keydown', (e) => {
-        // Esc para fechar modal
+    // Atalhos de teclado
+    document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            this.hideModal();
+            hideModal();
         }
         
-        // Atalhos de teclado para adicionar registros (1-4)
-        if (['1', '2', '3', '4'].includes(e.key) && this.activeTab === 'counter') {
+        if (['1', '2', '3', '4'].includes(e.key) && activeTab === 'counter') {
             const types = ['B', 'T0', 'T1', 'T2'];
-            this.addRecord(types[parseInt(e.key) - 1]);
+            addRecord(types[parseInt(e.key) - 1]);
         }
     });
-};
+}
 
-// ============================
+// ======================
 // NAVEGAÇÃO ENTRE TABS
-// ============================
-
-TirolesaCounter.prototype.switchTab = function(tab) {
-    this.activeTab = tab;
+// ======================
+function switchTab(tab) {
+    activeTab = tab;
     
-    // Atualizar botões de navegação
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    // Atualizar botões
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
         btn.classList.remove('active');
     });
-    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
     
-    // Atualizar conteúdo das tabs
-    document.querySelectorAll('.tab-content').forEach(content => {
+    // Atualizar conteúdo
+    document.querySelectorAll('.tab-content').forEach(function(content) {
         content.classList.remove('active');
     });
-    document.getElementById(`${tab}Tab`).classList.add('active');
+    document.getElementById(tab + 'Tab').classList.add('active');
     
-    // Atualizar dados específicos da tab
+    // Atualizar dados específicos
     if (tab === 'history') {
-        this.updateHistoryDisplay();
+        updateHistoryDisplay();
     } else if (tab === 'summary') {
-        this.updateSummaryDisplay();
+        updateSummaryDisplay();
     }
-};
+}
 
-// ============================
+// ======================
 // ATUALIZAÇÃO DE DISPLAYS
-// ============================
-
-TirolesaCounter.prototype.updateDisplay = function() {
-    this.updateCounterDisplay();
-    this.updateHistoryCount();
+// ======================
+function updateDisplay() {
+    updateCounterDisplay();
+    updateHistoryCount();
     
-    if (this.activeTab === 'history') {
-        this.updateHistoryDisplay();
-    } else if (this.activeTab === 'summary') {
-        this.updateSummaryDisplay();
+    if (activeTab === 'history') {
+        updateHistoryDisplay();
+    } else if (activeTab === 'summary') {
+        updateSummaryDisplay();
     }
-};
+}
 
-TirolesaCounter.prototype.updateCounterDisplay = function() {
-    const todayRecords = this.getTodayRecords();
+function updateCounterDisplay() {
+    const todayRecords = getTodayRecords();
     
     // Contar por tipo
     const counts = {
-        B: todayRecords.filter(r => r.type === 'B').length,
-        T0: todayRecords.filter(r => r.type === 'T0').length,
-        T1: todayRecords.filter(r => r.type === 'T1').length,
-        T2: todayRecords.filter(r => r.type === 'T2').length
+        B: todayRecords.filter(function(r) { return r.type === 'B'; }).length,
+        T0: todayRecords.filter(function(r) { return r.type === 'T0'; }).length,
+        T1: todayRecords.filter(function(r) { return r.type === 'T1'; }).length,
+        T2: todayRecords.filter(function(r) { return r.type === 'T2'; }).length
     };
     
-    // Atualizar contadores nos botões
-    Object.keys(counts).forEach(type => {
-        const countElement = document.getElementById(`count${type}`);
-        if (countElement) {
-            countElement.textContent = counts[type];
-        }
+    // Atualizar contadores
+    Object.keys(counts).forEach(function(type) {
+        const countElement = document.getElementById('count' + type);
+        const totalElement = document.getElementById('total' + type);
+        
+        if (countElement) countElement.textContent = counts[type];
+        if (totalElement) totalElement.textContent = counts[type];
     });
     
-    // Atualizar totais resumidos
-    Object.keys(counts).forEach(type => {
-        const totalElement = document.getElementById(`total${type}`);
-        if (totalElement) {
-            totalElement.textContent = counts[type];
-        }
-    });
-    
-    // Atualizar total geral
+    // Total geral
     const grandTotal = todayRecords.length;
     const grandTotalElement = document.getElementById('grandTotal');
     if (grandTotalElement) {
         grandTotalElement.textContent = grandTotal;
     }
-};
+}
 
-TirolesaCounter.prototype.updateHistoryCount = function() {
-    const todayRecords = this.getTodayRecords();
+function updateHistoryCount() {
+    const todayRecords = getTodayRecords();
     const countElement = document.getElementById('historyCount');
     if (countElement) {
-        countElement.textContent = `(${todayRecords.length})`;
+        countElement.textContent = '(' + todayRecords.length + ')';
     }
-};
+}
 
-TirolesaCounter.prototype.updateHistoryDisplay = function() {
-    const todayRecords = this.getTodayRecords();
+function updateHistoryDisplay() {
+    const todayRecords = getTodayRecords();
     const historyList = document.getElementById('historyList');
     const emptyHistory = document.getElementById('emptyHistory');
     const historyDescription = document.getElementById('historyDescription');
     
     // Atualizar descrição
     const count = todayRecords.length;
-    historyDescription.textContent = `${count} descida${count !== 1 ? 's' : ''} registrada${count !== 1 ? 's' : ''}`;
+    historyDescription.textContent = count + ' descida' + (count !== 1 ? 's' : '') + ' registrada' + (count !== 1 ? 's' : '');
     
     if (todayRecords.length === 0) {
         historyList.style.display = 'none';
@@ -323,15 +297,15 @@ TirolesaCounter.prototype.updateHistoryDisplay = function() {
     historyList.style.display = 'block';
     emptyHistory.style.display = 'none';
     
-    // Ordenar registros por data (mais recente primeiro)
-    const sortedRecords = [...todayRecords].sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+    // Ordenar por data (mais recente primeiro)
+    const sortedRecords = todayRecords.slice().sort(function(a, b) {
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    });
     
-    // Gerar HTML do histórico
-    historyList.innerHTML = sortedRecords.map((record, index) => {
-        const emoji = this.getTypeEmoji(record.type);
-        const color = this.getTypeColor(record.type);
+    // Gerar HTML
+    historyList.innerHTML = sortedRecords.map(function(record, index) {
+        const emoji = getTypeEmoji(record.type);
+        const color = getTypeColor(record.type);
         const time = new Date(record.timestamp).toLocaleTimeString('pt-BR', {
             hour: '2-digit',
             minute: '2-digit',
@@ -339,28 +313,26 @@ TirolesaCounter.prototype.updateHistoryDisplay = function() {
         });
         const number = sortedRecords.length - index;
         
-        return `
-            <div class="history-item">
-                <div class="history-item-content">
-                    <div class="history-emoji">${emoji}</div>
-                    <div class="history-details">
-                        <div class="history-type">
-                            <span class="type-badge ${color}">Cadeirinha ${record.type}</span>
-                            <span class="history-number">#${number}</span>
-                        </div>
-                        <div class="history-time">${time}</div>
-                    </div>
-                </div>
-                <button class="delete-btn" onclick="app.deleteRecord('${record.id}')" title="Excluir registro">
-                    🗑️
-                </button>
-            </div>
-        `;
+        return '<div class="history-item">' +
+            '<div class="history-item-content">' +
+                '<div class="history-emoji">' + emoji + '</div>' +
+                '<div class="history-details">' +
+                    '<div class="history-type">' +
+                        '<span class="type-badge ' + color + '">Cadeirinha ' + record.type + '</span>' +
+                        '<span class="history-number">#' + number + '</span>' +
+                    '</div>' +
+                    '<div class="history-time">' + time + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<button class="delete-btn" onclick="deleteRecord(\'' + record.id + '\')" title="Excluir registro">' +
+                '🗑️' +
+            '</button>' +
+        '</div>';
     }).join('');
-};
+}
 
-TirolesaCounter.prototype.updateSummaryDisplay = function() {
-    const todayRecords = this.getTodayRecords();
+function updateSummaryDisplay() {
+    const todayRecords = getTodayRecords();
     const summaryContent = document.getElementById('summaryContent');
     const emptySummary = document.getElementById('emptySummary');
     const exportBtn = document.getElementById('exportBtn');
@@ -376,135 +348,133 @@ TirolesaCounter.prototype.updateSummaryDisplay = function() {
     emptySummary.style.display = 'none';
     exportBtn.disabled = false;
     
-    // Gerar HTML do resumo
-    summaryContent.innerHTML = this.generateSummaryHTML(todayRecords);
-};
+    summaryContent.innerHTML = generateSummaryHTML(todayRecords);
+}
 
-TirolesaCounter.prototype.generateSummaryHTML = function(records) {
+function generateSummaryHTML(records) {
     const counts = {
-        B: records.filter(r => r.type === 'B').length,
-        T0: records.filter(r => r.type === 'T0').length,
-        T1: records.filter(r => r.type === 'T1').length,
-        T2: records.filter(r => r.type === 'T2').length
+        B: records.filter(function(r) { return r.type === 'B'; }).length,
+        T0: records.filter(function(r) { return r.type === 'T0'; }).length,
+        T1: records.filter(function(r) { return r.type === 'T1'; }).length,
+        T2: records.filter(function(r) { return r.type === 'T2'; }).length
     };
     
     // Primeira e última descida
-    const sortedRecords = [...records].sort((a, b) => 
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+    const sortedRecords = records.slice().sort(function(a, b) {
+        return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
     const first = sortedRecords[0];
     const last = sortedRecords[sortedRecords.length - 1];
     
     // Dados por hora
-    const hourlyData = this.getHourlyData(records);
+    const hourlyData = getHourlyData(records);
     
-    return `
-        <div class="summary-header">
-            <h2 class="summary-title">📊 Resumo do Dia</h2>
-            <p class="summary-date">${new Date().toLocaleDateString('pt-BR', { 
+    return '<div class="summary-header">' +
+            '<h2 class="summary-title">📊 Resumo do Dia</h2>' +
+            '<p class="summary-date">' + new Date().toLocaleDateString('pt-BR', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
-            })}</p>
-            ${this.operatorName ? `<p class="summary-operator">Operador: ${this.operatorName}</p>` : ''}
-        </div>
+            }) + '</p>' +
+            (operatorName ? '<p class="summary-operator">Operador: ' + operatorName + '</p>' : '') +
+        '</div>' +
 
-        <div class="summary-total">
-            <h3>Total de Descidas</h3>
-            <div class="summary-total-count">${records.length}</div>
-        </div>
+        '<div class="summary-total">' +
+            '<h3>Total de Descidas</h3>' +
+            '<div class="summary-total-count">' + records.length + '</div>' +
+        '</div>' +
 
-        <div class="summary-types">
-            <h3>Descidas por Tipo de Cadeirinha</h3>
-            <div class="summary-types-grid">
-                <div class="summary-type-item green">
-                    <div class="summary-type-emoji">🟢</div>
-                    <div class="summary-type-count">${counts.B}</div>
-                    <div class="summary-type-label">Cadeirinha B</div>
-                </div>
-                <div class="summary-type-item blue">
-                    <div class="summary-type-emoji">🔵</div>
-                    <div class="summary-type-count">${counts.T0}</div>
-                    <div class="summary-type-label">Cadeirinha T0</div>
-                </div>
-                <div class="summary-type-item yellow">
-                    <div class="summary-type-emoji">🟡</div>
-                    <div class="summary-type-count">${counts.T1}</div>
-                    <div class="summary-type-label">Cadeirinha T1</div>
-                </div>
-                <div class="summary-type-item red">
-                    <div class="summary-type-emoji">🔴</div>
-                    <div class="summary-type-count">${counts.T2}</div>
-                    <div class="summary-type-label">Cadeirinha T2</div>
-                </div>
-            </div>
-        </div>
+        '<div class="summary-types">' +
+            '<h3>Descidas por Tipo de Cadeirinha</h3>' +
+            '<div class="summary-types-grid">' +
+                '<div class="summary-type-item green">' +
+                    '<div class="summary-type-emoji">🟢</div>' +
+                    '<div class="summary-type-count">' + counts.B + '</div>' +
+                    '<div class="summary-type-label">Cadeirinha B</div>' +
+                '</div>' +
+                '<div class="summary-type-item blue">' +
+                    '<div class="summary-type-emoji">🔵</div>' +
+                    '<div class="summary-type-count">' + counts.T0 + '</div>' +
+                    '<div class="summary-type-label">Cadeirinha T0</div>' +
+                '</div>' +
+                '<div class="summary-type-item yellow">' +
+                    '<div class="summary-type-emoji">🟡</div>' +
+                    '<div class="summary-type-count">' + counts.T1 + '</div>' +
+                    '<div class="summary-type-label">Cadeirinha T1</div>' +
+                '</div>' +
+                '<div class="summary-type-item red">' +
+                    '<div class="summary-type-emoji">🔴</div>' +
+                    '<div class="summary-type-count">' + counts.T2 + '</div>' +
+                    '<div class="summary-type-label">Cadeirinha T2</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
 
-        <div class="summary-first-last">
-            <div class="summary-time-card">
-                <h3>🌅 Primeira Descida</h3>
-                <div class="summary-time-emoji">${this.getTypeEmoji(first.type)}</div>
-                <div class="summary-time-type">Cadeirinha ${first.type}</div>
-                <div class="summary-time-value">${new Date(first.timestamp).toLocaleTimeString('pt-BR', {
+        '<div class="summary-first-last">' +
+            '<div class="summary-time-card">' +
+                '<h3>🌅 Primeira Descida</h3>' +
+                '<div class="summary-time-emoji">' + getTypeEmoji(first.type) + '</div>' +
+                '<div class="summary-time-type">Cadeirinha ' + first.type + '</div>' +
+                '<div class="summary-time-value">' + new Date(first.timestamp).toLocaleTimeString('pt-BR', {
                     hour: '2-digit',
                     minute: '2-digit'
-                })}</div>
-            </div>
-            <div class="summary-time-card">
-                <h3>🌅 Última Descida</h3>
-                <div class="summary-time-emoji">${this.getTypeEmoji(last.type)}</div>
-                <div class="summary-time-type">Cadeirinha ${last.type}</div>
-                <div class="summary-time-value">${new Date(last.timestamp).toLocaleTimeString('pt-BR', {
+                }) + '</div>' +
+            '</div>' +
+            '<div class="summary-time-card">' +
+                '<h3>🌆 Última Descida</h3>' +
+                '<div class="summary-time-emoji">' + getTypeEmoji(last.type) + '</div>' +
+                '<div class="summary-time-type">Cadeirinha ' + last.type + '</div>' +
+                '<div class="summary-time-value">' + new Date(last.timestamp).toLocaleTimeString('pt-BR', {
                     hour: '2-digit',
                     minute: '2-digit'
-                })}</div>
-            </div>
-        </div>
+                }) + '</div>' +
+            '</div>' +
+        '</div>' +
 
-        ${hourlyData.length > 0 ? this.generateHourlyChartHTML(hourlyData) : ''}
-    `;
-};
+        (hourlyData.length > 0 ? generateHourlyChartHTML(hourlyData) : '');
+}
 
-TirolesaCounter.prototype.generateHourlyChartHTML = function(hourlyData) {
-    const maxCount = Math.max(...hourlyData.map(([, count]) => count), 1);
+function generateHourlyChartHTML(hourlyData) {
+    const maxCount = Math.max.apply(Math, hourlyData.map(function(item) { return item[1]; }));
     
-    const barsHTML = hourlyData.map(([hour, count]) => `
-        <div class="chart-bar">
-            <div class="chart-time">${hour}</div>
-            <div class="chart-bar-container">
-                <div class="chart-bar-fill" style="width: ${(count / maxCount) * 100}%">
-                    ${count > 0 ? count : ''}
-                </div>
-            </div>
-        </div>
-    `).join('');
+    const barsHTML = hourlyData.map(function(item) {
+        const hour = item[0];
+        const count = item[1];
+        return '<div class="chart-bar">' +
+            '<div class="chart-time">' + hour + '</div>' +
+            '<div class="chart-bar-container">' +
+                '<div class="chart-bar-fill" style="width: ' + (count / maxCount * 100) + '%">' +
+                    (count > 0 ? count : '') +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
     
-    return `
-        <div class="hourly-chart">
-            <h3>Descidas por Hora</h3>
-            ${barsHTML}
-        </div>
-    `;
-};
+    return '<div class="hourly-chart">' +
+        '<h3>Descidas por Hora</h3>' +
+        barsHTML +
+    '</div>';
+}
 
-TirolesaCounter.prototype.getHourlyData = function(records) {
+function getHourlyData(records) {
     const hourlyCount = {};
     
-    records.forEach(record => {
+    records.forEach(function(record) {
         const hour = new Date(record.timestamp).getHours();
-        const hourKey = `${hour.toString().padStart(2, '0')}:00`;
+        const hourKey = hour.toString().padStart(2, '0') + ':00';
         hourlyCount[hourKey] = (hourlyCount[hourKey] || 0) + 1;
     });
     
-    return Object.entries(hourlyCount).sort(([a], [b]) => a.localeCompare(b));
-};
+    return Object.entries(hourlyCount).sort(function(a, b) {
+        return a[0].localeCompare(b[0]);
+    });
+}
 
-// ============================
+// ======================
 // FUNÇÕES AUXILIARES
-// ============================
-
-TirolesaCounter.prototype.getTypeEmoji = function(type) {
+// ======================
+function getTypeEmoji(type) {
     const emojis = {
         'B': '🟢',
         'T0': '🔵',
@@ -512,9 +482,9 @@ TirolesaCounter.prototype.getTypeEmoji = function(type) {
         'T2': '🔴'
     };
     return emojis[type] || '⚪';
-};
+}
 
-TirolesaCounter.prototype.getTypeColor = function(type) {
+function getTypeColor(type) {
     const colors = {
         'B': 'green',
         'T0': 'blue',
@@ -522,65 +492,58 @@ TirolesaCounter.prototype.getTypeColor = function(type) {
         'T2': 'red'
     };
     return colors[type] || 'gray';
-};
+}
 
-// ============================
+// ======================
 // SISTEMA DE MODAL
-// ============================
-
-TirolesaCounter.prototype.showConfirmModal = function(message, callback) {
-    this.modalCallback = callback;
+// ======================
+function showConfirmModal(message, callback) {
+    modalCallback = callback;
     document.getElementById('modalMessage').textContent = message;
     document.getElementById('modalOverlay').classList.add('active');
-};
+}
 
-TirolesaCounter.prototype.hideModal = function() {
+function hideModal() {
     document.getElementById('modalOverlay').classList.remove('active');
-    this.modalCallback = null;
-};
+    modalCallback = null;
+}
 
-// ============================
+// ======================
 // SISTEMA DE NOTIFICAÇÕES
-// ============================
-
-TirolesaCounter.prototype.showNotification = function(message) {
-    // Criar elemento de notificação
+// ======================
+function showNotification(message) {
     const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1001;
-        animation: slideInRight 0.3s ease-out;
-        font-weight: 600;
-    `;
-    notification.textContent = message;
+    notification.style.cssText = 
+        'position: fixed;' +
+        'top: 20px;' +
+        'right: 20px;' +
+        'background: #10b981;' +
+        'color: white;' +
+        'padding: 1rem 1.5rem;' +
+        'border-radius: 0.5rem;' +
+        'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);' +
+        'z-index: 1001;' +
+        'font-weight: 600;' +
+        'animation: slideInRight 0.3s ease-out;';
     
-    // Adicionar ao DOM
+    notification.textContent = message;
     document.body.appendChild(notification);
     
-    // Remover após 3 segundos
-    setTimeout(() => {
+    setTimeout(function() {
         notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => {
+        setTimeout(function() {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
             }
         }, 300);
     }, 3000);
-};
+}
 
-// ============================
-// EXPORTAÇÃO COMO IMAGEM
-// ============================
-
-TirolesaCounter.prototype.exportSummaryAsImage = function() {
-    const records = this.getTodayRecords();
+// ======================
+// EXPORTAÇÃO DE IMAGEM
+// ======================
+function exportSummaryAsImage() {
+    const records = getTodayRecords();
     
     if (records.length === 0) {
         alert('Não há dados para exportar. Registre algumas descidas primeiro.');
@@ -590,183 +553,53 @@ TirolesaCounter.prototype.exportSummaryAsImage = function() {
     const exportBtn = document.getElementById('exportBtn');
     const originalHTML = exportBtn.innerHTML;
     
-    // Mostrar estado de carregamento
-    exportBtn.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <span>Exportando...</span>
-        </div>
-    `;
+    exportBtn.innerHTML = '<div class="loading"><div class="spinner"></div><span>Exportando...</span></div>';
     exportBtn.disabled = true;
     
-    // Simular processamento (em uma implementação real, usaria html2canvas)
-    setTimeout(() => {
+    setTimeout(function() {
         try {
-            // Aqui seria implementada a lógica real de exportação
-            // Por simplicidade, vamos simular o download
-            this.simulateImageExport();
-            
-            this.showNotification('Resumo exportado com sucesso!');
+            simulateImageExport();
+            showNotification('Resumo exportado com sucesso!');
         } catch (error) {
             console.error('Erro ao exportar:', error);
             alert('Erro ao exportar imagem. Tente novamente.');
         } finally {
-            // Restaurar botão
             exportBtn.innerHTML = originalHTML;
             exportBtn.disabled = false;
         }
     }, 2000);
-};
+}
 
-TirolesaCounter.prototype.simulateImageExport = function() {
-    // Simular download de arquivo
+function simulateImageExport() {
     const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-    const filename = `tirolesa-resumo-${date}${this.operatorName ? `-${this.operatorName.replace(/\s+/g, '-')}` : ''}.png`;
+    const filename = 'tirolesa-resumo-' + date + (operatorName ? '-' + operatorName.replace(/\s+/g, '-') : '') + '.png';
     
-    console.log(`Simulando download de: ${filename}`);
-    
-    // Em uma implementação real, aqui seria usado html2canvas:
-    /*
-    html2canvas(document.getElementById('summaryContent')).then(canvas => {
-        canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 'image/png', 1.0);
-    });
-    */
-};
-
-// ============================
-// CSS ADICIONAL PARA ANIMAÇÕES
-// ============================
-
-const additionalCSS = `
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    console.log('Simulando download de: ' + filename);
+    alert('Em uma implementação real, seria baixado o arquivo: ' + filename);
 }
 
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-`;
-
-// Adicionar CSS adicional ao documento
+// ======================
+// CSS PARA ANIMAÇÕES
+// ======================
 const style = document.createElement('style');
-style.textContent = additionalCSS;
+style.textContent = 
+    '@keyframes slideInRight {' +
+        'from { transform: translateX(100%); opacity: 0; }' +
+        'to { transform: translateX(0); opacity: 1; }' +
+    '}' +
+    '@keyframes slideOutRight {' +
+        'from { transform: translateX(0); opacity: 1; }' +
+        'to { transform: translateX(100%); opacity: 0; }' +
+    '}';
 document.head.appendChild(style);
 
-// ============================
-// INICIALIZAÇÃO DA APLICAÇÃO
-// ============================
-
-// Variável global para acesso às funções
-let app;
-
-// Inicializar quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏔️ Inicializando Contador de Descidas de Tirolesa');
-    console.log('📊 Sistema desenvolvido em HTML/CSS/JavaScript puro');
-    console.log('💾 Dados salvos no localStorage do navegador');
-    
-    // Criar instância da aplicação
-    app = new TirolesaCounter();
-    
-    console.log('✅ Aplicação inicializada com sucesso!');
-    console.log('🔧 Atalhos de teclado disponíveis:');
-    console.log('  - 1: Adicionar Cadeirinha B');
-    console.log('  - 2: Adicionar Cadeirinha T0');
-    console.log('  - 3: Adicionar Cadeirinha T1');
-    console.log('  - 4: Adicionar Cadeirinha T2');
-    console.log('  - ESC: Fechar modal');
-});
-
-// ============================
-// TRATAMENTO DE ERROS GLOBAIS
-// ============================
-
+// ======================
+// TRATAMENTO DE ERROS
+// ======================
 window.addEventListener('error', function(event) {
     console.error('Erro na aplicação:', event.error);
-    // Em produção, aqui poderia ser implementado um sistema de logging
 });
 
-window.addEventListener('unhandledrejection', function(event) {
-    console.error('Promise rejeitada:', event.reason);
-    // Tratar promises rejeitadas
-});
-
-// ============================
-// SERVICE WORKER (OPCIONAL)
-// ============================
-
-// Registrar service worker para funcionalidade offline (opcional)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        // navigator.registerServiceWorker('/sw.js')
-        //     .then(registration => console.log('SW registrado'))
-        //     .catch(error => console.log('Erro no SW'));
-    });
-}
-
-/*
-DOCUMENTAÇÃO TÉCNICA:
-=====================
-
-ARQUITETURA:
-- Classe TirolesaCounter centraliza toda a lógica
-- Sistema de eventos para interações do usuário
-- LocalStorage para persistência de dados
-- Interface responsiva com CSS Grid/Flexbox
-
-ESTRUTURA DE DADOS:
-- Record: { id: string, type: 'B'|'T0'|'T1'|'T2', timestamp: ISO string }
-- Armazenamento: localStorage com chaves 'tirolesa-records' e 'operator-name'
-
-FUNCIONALIDADES:
-1. Contador: Botões para registrar descidas por tipo
-2. Histórico: Lista de registros com opção de exclusão
-3. Resumo: Estatísticas detalhadas e gráficos
-4. Exportação: Conversão do resumo em imagem PNG
-5. Persistência: Dados mantidos entre sessões
-
-RESPONSIVIDADE:
-- Mobile-first design
-- Breakpoints: 768px e 480px
-- Layouts adaptativos com CSS Grid
-
-ACESSIBILIDADE:
-- Atalhos de teclado
-- Cores contrastantes
-- Feedback visual e textual
-- Semântica HTML adequada
-
-PERFORMANCE:
-- Código otimizado para carregamento rápido
-- Lazy loading de funcionalidades
-- Debounce em inputs quando necessário
-
-BROWSER SUPPORT:
-- Chrome/Edge 60+
-- Firefox 55+
-- Safari 12+
-- Mobile browsers
-*/
+console.log('📋 Sistema carregado - Funcionalidades disponíveis:');
+console.log('🔧 Atalhos: 1-4 para adicionar descidas, ESC para fechar modal');
+console.log('💾 Dados salvos automaticamente no navegador');
