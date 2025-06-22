@@ -51,7 +51,10 @@ function loadData() {
         var storedOperator = localStorage.getItem('operator-name');
         operatorName = storedOperator || '';
         
-        document.getElementById('operatorName').value = operatorName;
+        var operatorInput = document.getElementById('operatorName');
+        if (operatorInput) {
+            operatorInput.value = operatorName;
+        }
         console.log('Dados carregados:', records.length, 'registros');
     } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -159,14 +162,16 @@ function clearAllRecords() {
 // ======================
 function updateCurrentDate() {
     var dateElement = document.getElementById('currentDate');
-    var options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    };
-    var currentDate = new Date().toLocaleDateString('pt-BR', options);
-    dateElement.textContent = currentDate;
+    if (dateElement) {
+        var options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        var currentDate = new Date().toLocaleDateString('pt-BR', options);
+        dateElement.textContent = currentDate;
+    }
 }
 
 function bindEvents() {
@@ -224,37 +229,56 @@ function bindEvents() {
     }
 
     // Campo nome do operador
-    document.getElementById('operatorName').addEventListener('input', function(e) {
-        saveOperatorName(e.target.value);
-    });
+    var operatorInput = document.getElementById('operatorName');
+    if (operatorInput) {
+        operatorInput.addEventListener('input', function(e) {
+            saveOperatorName(e.target.value);
+        });
+    }
 
     // Botão limpar tudo
-    document.getElementById('clearAllBtn').addEventListener('click', function() {
-        clearAllRecords();
-    });
+    var clearBtn = document.getElementById('clearAllBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            clearAllRecords();
+        });
+    }
 
     // Botão exportar
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        exportSummaryAsImage();
-    });
+    var exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function() {
+            exportSummaryAsImage();
+        });
+    }
 
     // Eventos do modal
-    document.getElementById('modalCancel').addEventListener('click', function() {
-        hideModal();
-    });
-
-    document.getElementById('modalConfirm').addEventListener('click', function() {
-        if (modalCallback) {
-            modalCallback();
-        }
-        hideModal();
-    });
-
-    document.getElementById('modalOverlay').addEventListener('click', function(e) {
-        if (e.target === e.currentTarget) {
+    var modalCancel = document.getElementById('modalCancel');
+    var modalConfirm = document.getElementById('modalConfirm');
+    var modalOverlay = document.getElementById('modalOverlay');
+    
+    if (modalCancel) {
+        modalCancel.addEventListener('click', function() {
             hideModal();
-        }
-    });
+        });
+    }
+
+    if (modalConfirm) {
+        modalConfirm.addEventListener('click', function() {
+            if (modalCallback) {
+                modalCallback();
+            }
+            hideModal();
+        });
+    }
+
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === e.currentTarget) {
+                hideModal();
+            }
+        });
+    }
 
     // Atalhos de teclado
     document.addEventListener('keydown', function(e) {
@@ -280,14 +304,20 @@ function switchTab(tab) {
     for (var i = 0; i < tabBtns.length; i++) {
         tabBtns[i].classList.remove('active');
     }
-    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    var activeBtn = document.querySelector('[data-tab="' + tab + '"]');
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
     
     // Atualizar conteúdo
     var tabContents = document.querySelectorAll('.tab-content');
     for (var i = 0; i < tabContents.length; i++) {
         tabContents[i].classList.remove('active');
     }
-    document.getElementById(tab + 'Tab').classList.add('active');
+    var activeContent = document.getElementById(tab + 'Tab');
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
     
     // Atualizar dados específicos
     if (tab === 'history') {
@@ -357,16 +387,18 @@ function updateHistoryDisplay() {
     
     // Atualizar descrição
     var count = todayRecords.length;
-    historyDescription.textContent = count + ' descida' + (count !== 1 ? 's' : '') + ' registrada' + (count !== 1 ? 's' : '');
+    if (historyDescription) {
+        historyDescription.textContent = count + ' descida' + (count !== 1 ? 's' : '') + ' registrada' + (count !== 1 ? 's' : '');
+    }
     
     if (todayRecords.length === 0) {
-        historyList.style.display = 'none';
-        emptyHistory.style.display = 'block';
+        if (historyList) historyList.style.display = 'none';
+        if (emptyHistory) emptyHistory.style.display = 'block';
         return;
     }
     
-    historyList.style.display = 'block';
-    emptyHistory.style.display = 'none';
+    if (historyList) historyList.style.display = 'block';
+    if (emptyHistory) emptyHistory.style.display = 'none';
     
     // Ordenar por data (mais recente primeiro)
     var sortedRecords = todayRecords.slice().sort(function(a, b) {
@@ -403,7 +435,9 @@ function updateHistoryDisplay() {
         '</div>';
     }
     
-    historyList.innerHTML = html;
+    if (historyList) {
+        historyList.innerHTML = html;
+    }
 }
 
 function updateSummaryDisplay() {
@@ -413,17 +447,19 @@ function updateSummaryDisplay() {
     var exportBtn = document.getElementById('exportBtn');
     
     if (todayRecords.length === 0) {
-        summaryContent.style.display = 'none';
-        emptySummary.style.display = 'block';
-        exportBtn.disabled = true;
+        if (summaryContent) summaryContent.style.display = 'none';
+        if (emptySummary) emptySummary.style.display = 'block';
+        if (exportBtn) exportBtn.disabled = true;
         return;
     }
     
-    summaryContent.style.display = 'block';
-    emptySummary.style.display = 'none';
-    exportBtn.disabled = false;
+    if (summaryContent) summaryContent.style.display = 'block';
+    if (emptySummary) emptySummary.style.display = 'none';
+    if (exportBtn) exportBtn.disabled = false;
     
-    summaryContent.innerHTML = generateSummaryHTML(todayRecords);
+    if (summaryContent) {
+        summaryContent.innerHTML = generateSummaryHTML(todayRecords);
+    }
 }
 
 function generateSummaryHTML(records) {
@@ -588,12 +624,16 @@ function getTypeColor(type) {
 // ======================
 function showConfirmModal(message, callback) {
     modalCallback = callback;
-    document.getElementById('modalMessage').textContent = message;
-    document.getElementById('modalOverlay').classList.add('active');
+    var modalMessage = document.getElementById('modalMessage');
+    var modalOverlay = document.getElementById('modalOverlay');
+    
+    if (modalMessage) modalMessage.textContent = message;
+    if (modalOverlay) modalOverlay.classList.add('active');
 }
 
 function hideModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
+    var modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) modalOverlay.classList.remove('active');
     modalCallback = null;
 }
 
@@ -640,6 +680,8 @@ function exportSummaryAsImage() {
     }
     
     var exportBtn = document.getElementById('exportBtn');
+    if (!exportBtn) return;
+    
     var originalHTML = exportBtn.innerHTML;
     
     exportBtn.innerHTML = '<div class="loading"><div class="spinner"></div><span>Exportando...</span></div>';
