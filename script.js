@@ -1,3 +1,4 @@
+
 /*
 SISTEMA DE CONTAGEM DE DESCIDAS DE TIROLESA - HTML/CSS/JS PURO
 ============================================================
@@ -7,16 +8,12 @@ Desenvolvido em HTML, CSS e JavaScript puro para máxima compatibilidade.
 
 FUNCIONALIDADES:
 - Contador de descidas por tipo (B, T0, T1, T2)
-- Reduzir contagem (clique longo ou botão específico)
+- Reduzir contagem (botão específico)
 - Histórico detalhado com horários
 - Resumo estatístico
 - Persistência local (localStorage)
 - Interface responsiva
 - Sistema de notificações
-
-ESTRUTURA DE DADOS:
-- Record: { id: timestamp, type: string, timestamp: ISO date }
-- Armazenamento: localStorage
 */
 
 // ======================
@@ -55,6 +52,7 @@ function loadData() {
         operatorName = storedOperator || '';
         
         document.getElementById('operatorName').value = operatorName;
+        console.log('Dados carregados:', records.length, 'registros');
     } catch (error) {
         console.error('Erro ao carregar dados:', error);
         records = [];
@@ -65,6 +63,7 @@ function loadData() {
 function saveRecords() {
     try {
         localStorage.setItem('tirolesa-records', JSON.stringify(records));
+        console.log('Dados salvos:', records.length, 'registros');
     } catch (error) {
         console.error('Erro ao salvar registros:', error);
     }
@@ -87,6 +86,8 @@ function getTodayRecords() {
 // FUNÇÕES PRINCIPAIS
 // ======================
 function addRecord(type) {
+    console.log('Adicionando registro do tipo:', type);
+    
     var newRecord = {
         id: Date.now().toString(),
         type: type,
@@ -97,9 +98,13 @@ function addRecord(type) {
     saveRecords();
     updateDisplay();
     showNotification('Descida ' + type + ' registrada!');
+    
+    console.log('Registro adicionado:', newRecord);
 }
 
 function removeLastRecord(type) {
+    console.log('Removendo último registro do tipo:', type);
+    
     var todayRecords = getTodayRecords();
     var typeRecords = todayRecords.filter(function(record) {
         return record.type === type;
@@ -107,11 +112,14 @@ function removeLastRecord(type) {
     
     if (typeRecords.length === 0) {
         showNotification('Nenhuma descida ' + type + ' para remover');
+        console.log('Nenhum registro do tipo', type, 'para remover');
         return;
     }
     
-    // Pegar o último registro deste tipo
-    var lastRecord = typeRecords[typeRecords.length - 1];
+    // Pegar o último registro deste tipo (mais recente)
+    var lastRecord = typeRecords.sort(function(a, b) {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+    })[0];
     
     // Remover o registro
     records = records.filter(function(record) {
@@ -121,6 +129,8 @@ function removeLastRecord(type) {
     saveRecords();
     updateDisplay();
     showNotification('Descida ' + type + ' removida!');
+    
+    console.log('Registro removido:', lastRecord);
 }
 
 function deleteRecord(id) {
@@ -162,31 +172,44 @@ function updateCurrentDate() {
 function bindEvents() {
     // Eventos dos botões de contador (adicionar)
     var counterBtns = document.querySelectorAll('.counter-btn');
+    console.log('Vinculando eventos aos botões de contador:', counterBtns.length);
+    
     for (var i = 0; i < counterBtns.length; i++) {
         counterBtns[i].addEventListener('click', function(e) {
-            var type = e.currentTarget.dataset.type;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var type = this.getAttribute('data-type');
+            console.log('Clique no botão contador:', type);
             addRecord(type);
             
             // Animação de feedback
-            e.currentTarget.style.transform = 'scale(0.95)';
+            var btn = this;
+            btn.style.transform = 'scale(0.95)';
             setTimeout(function() {
-                e.currentTarget.style.transform = '';
+                btn.style.transform = '';
             }, 150);
         });
     }
 
     // Eventos dos botões de reduzir
     var reduceBtns = document.querySelectorAll('.reduce-btn');
+    console.log('Vinculando eventos aos botões de redução:', reduceBtns.length);
+    
     for (var i = 0; i < reduceBtns.length; i++) {
         reduceBtns[i].addEventListener('click', function(e) {
-            e.stopPropagation(); // Evitar trigger do botão pai
-            var type = e.currentTarget.dataset.type;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var type = this.getAttribute('data-type');
+            console.log('Clique no botão redução:', type);
             removeLastRecord(type);
             
             // Animação de feedback
-            e.currentTarget.style.transform = 'scale(0.9)';
+            var btn = this;
+            btn.style.transform = 'scale(0.9)';
             setTimeout(function() {
-                e.currentTarget.style.transform = '';
+                btn.style.transform = '';
             }, 150);
         });
     }
