@@ -1,15 +1,5 @@
 
-/* 
-SISTEMA DE DESIGN E CORES:
-- Primária: #222222 (textos principais)
-- Secundária: #666666 (textos secundários) 
-- Verde: #10b981 (Cadeirinha B)
-- Azul: #3b82f6 (Cadeirinha T0)
-- Amarelo: #f59e0b (Cadeirinha T1)
-- Vermelho: #ef4444 (Cadeirinha T2)
-- Fundo: Gradiente azul-verde suave
-- Cards: Branco com sombra sutil
-*/
+/* ... keep existing code (reset, body, app, container, header styles) the same ... */
 
 * {
     margin: 0;
@@ -22,6 +12,7 @@ body {
     background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
     color: #222222;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .app {
@@ -52,13 +43,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem 0;
+    padding: 1rem 0;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
 .app-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #222222;
     margin-bottom: 0.25rem;
@@ -66,7 +57,7 @@ body {
 
 .current-date {
     color: #666666;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .header-controls {
@@ -83,6 +74,7 @@ body {
     font-size: 0.875rem;
     background: white;
     transition: border-color 0.2s;
+    width: 150px;
 }
 
 .operator-input:focus {
@@ -115,7 +107,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    margin: 1.5rem 0;
+    margin: 1rem 0;
     flex-wrap: wrap;
 }
 
@@ -132,6 +124,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.9rem;
 }
 
 .tab-btn:hover {
@@ -178,11 +171,11 @@ body {
    ================= */
 .section-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .section-header h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: #222222;
@@ -190,128 +183,168 @@ body {
 
 .section-header p {
     color: #666666;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 /* =================
-   COUNTER SECTION
+   COUNTER SECTION - OTIMIZADO
    ================= */
 .counter-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
     max-width: 1000px;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.5rem;
+    padding: 0 0.5rem;
 }
 
-.counter-btn {
-    background: white;
-    border: none;
-    padding: 2rem;
-    border-radius: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.counter-btn-container {
     position: relative;
+    display: flex;
+    align-items: stretch;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    transition: all 0.2s;
 }
 
-.counter-btn:hover {
-    transform: translateY(-2px) scale(1.02);
+.counter-btn-container:hover {
+    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+.counter-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .counter-btn:active {
-    transform: translateY(0) scale(0.98);
+    transform: scale(0.98);
 }
 
 /* Cores específicas para cada tipo de cadeirinha */
-.counter-btn.green {
+.counter-btn-container:has(.counter-btn.green) {
     border-left: 5px solid #10b981;
 }
 
-.counter-btn.blue {
+.counter-btn-container:has(.counter-btn.blue) {
     border-left: 5px solid #3b82f6;
 }
 
-.counter-btn.yellow {
+.counter-btn-container:has(.counter-btn.yellow) {
     border-left: 5px solid #f59e0b;
 }
 
-.counter-btn.red {
+.counter-btn-container:has(.counter-btn.red) {
     border-left: 5px solid #ef4444;
 }
 
 .counter-emoji {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .counter-label {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     color: #222222;
 }
 
 .counter-count {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: bold;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 0.5rem;
     padding: 0.5rem 1rem;
     display: inline-block;
     color: #222222;
+    min-width: 60px;
+}
+
+/* Botão de reduzir */
+.reduce-btn {
+    background: #f87171;
+    color: white;
+    border: none;
+    width: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+.reduce-btn:hover {
+    background: #ef4444;
+}
+
+.reduce-btn:active {
+    transform: scale(0.9);
 }
 
 /* =================
-   DAILY TOTALS
+   DAILY TOTALS - COMPACTO
    ================= */
 .daily-totals {
     background: white;
     border-radius: 1rem;
-    padding: 1.5rem;
+    padding: 1.25rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
 .daily-totals h3 {
     text-align: center;
     margin-bottom: 1rem;
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: #222222;
 }
 
 .totals-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 1rem;
 }
 
 .total-item {
     background: #f9fafb;
     border-radius: 0.5rem;
-    padding: 0.75rem;
+    padding: 0.75rem 0.5rem;
     text-align: center;
 }
 
 .total-emoji {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin-bottom: 0.25rem;
 }
 
 .total-count {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #222222;
 }
 
 .total-type {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: #666666;
+    font-weight: 600;
 }
 
 .grand-total {
@@ -327,10 +360,12 @@ body {
 }
 
 .grand-total-count {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #222222;
 }
+
+/* ... keep existing code (history, summary, modal, responsive, utility classes) the same ... */
 
 /* =================
    HISTORY SECTION
@@ -788,21 +823,31 @@ body {
    ================= */
 @media (max-width: 768px) {
     .app-title {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
     
     .header-content {
         flex-direction: column;
         text-align: center;
+        padding: 0.75rem 0;
     }
     
     .counter-buttons {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 0.75rem;
+        padding: 0;
     }
     
     .counter-btn {
-        padding: 1.5rem;
+        padding: 1.25rem 1rem;
+    }
+    
+    .counter-emoji {
+        font-size: 2rem;
+    }
+    
+    .counter-count {
+        font-size: 1.5rem;
     }
     
     .totals-grid {
@@ -824,6 +869,15 @@ body {
     .modal-buttons {
         flex-direction: column;
     }
+
+    .operator-input {
+        width: 120px;
+    }
+
+    .tab-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -836,11 +890,16 @@ body {
     }
     
     .counter-emoji {
-        font-size: 2.5rem;
+        font-size: 1.75rem;
     }
     
     .counter-count {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+    }
+
+    .reduce-btn {
+        width: 40px;
+        font-size: 1rem;
     }
 }
 

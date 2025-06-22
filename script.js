@@ -1,4 +1,3 @@
-
 /*
 SISTEMA DE CONTAGEM DE DESCIDAS DE TIROLESA - HTML/CSS/JS PURO
 ============================================================
@@ -8,6 +7,7 @@ Desenvolvido em HTML, CSS e JavaScript puro para máxima compatibilidade.
 
 FUNCIONALIDADES:
 - Contador de descidas por tipo (B, T0, T1, T2)
+- Reduzir contagem (clique longo ou botão específico)
 - Histórico detalhado com horários
 - Resumo estatístico
 - Persistência local (localStorage)
@@ -99,6 +99,30 @@ function addRecord(type) {
     showNotification('Descida ' + type + ' registrada!');
 }
 
+function removeLastRecord(type) {
+    var todayRecords = getTodayRecords();
+    var typeRecords = todayRecords.filter(function(record) {
+        return record.type === type;
+    });
+    
+    if (typeRecords.length === 0) {
+        showNotification('Nenhuma descida ' + type + ' para remover');
+        return;
+    }
+    
+    // Pegar o último registro deste tipo
+    var lastRecord = typeRecords[typeRecords.length - 1];
+    
+    // Remover o registro
+    records = records.filter(function(record) {
+        return record.id !== lastRecord.id;
+    });
+    
+    saveRecords();
+    updateDisplay();
+    showNotification('Descida ' + type + ' removida!');
+}
+
 function deleteRecord(id) {
     records = records.filter(function(record) {
         return record.id !== id;
@@ -136,7 +160,7 @@ function updateCurrentDate() {
 }
 
 function bindEvents() {
-    // Eventos dos botões de contador
+    // Eventos dos botões de contador (adicionar)
     var counterBtns = document.querySelectorAll('.counter-btn');
     for (var i = 0; i < counterBtns.length; i++) {
         counterBtns[i].addEventListener('click', function(e) {
@@ -145,6 +169,22 @@ function bindEvents() {
             
             // Animação de feedback
             e.currentTarget.style.transform = 'scale(0.95)';
+            setTimeout(function() {
+                e.currentTarget.style.transform = '';
+            }, 150);
+        });
+    }
+
+    // Eventos dos botões de reduzir
+    var reduceBtns = document.querySelectorAll('.reduce-btn');
+    for (var i = 0; i < reduceBtns.length; i++) {
+        reduceBtns[i].addEventListener('click', function(e) {
+            e.stopPropagation(); // Evitar trigger do botão pai
+            var type = e.currentTarget.dataset.type;
+            removeLastRecord(type);
+            
+            // Animação de feedback
+            e.currentTarget.style.transform = 'scale(0.9)';
             setTimeout(function() {
                 e.currentTarget.style.transform = '';
             }, 150);
