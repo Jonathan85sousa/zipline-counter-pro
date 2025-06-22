@@ -5,24 +5,15 @@ SISTEMA DE CONTAGEM DE DESCIDAS DE TIROLESA - HTML/CSS/JS PURO
 
 Este sistema permite registrar e gerenciar descidas de tirolesa por tipo de cadeirinha.
 Desenvolvido em HTML, CSS e JavaScript puro para máxima compatibilidade.
-
-FUNCIONALIDADES:
-- Contador de descidas por tipo (B, T0, T1, T2)
-- Reduzir contagem (botão específico)
-- Histórico detalhado com horários
-- Resumo estatístico
-- Persistência local (localStorage)
-- Interface responsiva
-- Sistema de notificações
 */
 
 // ======================
 // VARIÁVEIS GLOBAIS
 // ======================
-var records = [];
-var operatorName = '';
-var activeTab = 'counter';
-var modalCallback = null;
+let records = [];
+let operatorName = '';
+let activeTab = 'counter';
+let modalCallback = null;
 
 // ======================
 // INICIALIZAÇÃO
@@ -45,13 +36,13 @@ function initializeApp() {
 // ======================
 function loadData() {
     try {
-        var storedRecords = localStorage.getItem('tirolesa-records');
+        const storedRecords = localStorage.getItem('tirolesa-records');
         records = storedRecords ? JSON.parse(storedRecords) : [];
         
-        var storedOperator = localStorage.getItem('operator-name');
+        const storedOperator = localStorage.getItem('operator-name');
         operatorName = storedOperator || '';
         
-        var operatorInput = document.getElementById('operatorName');
+        const operatorInput = document.getElementById('operatorName');
         if (operatorInput) {
             operatorInput.value = operatorName;
         }
@@ -78,9 +69,9 @@ function saveOperatorName(name) {
 }
 
 function getTodayRecords() {
-    var today = new Date().toDateString();
+    const today = new Date().toDateString();
     return records.filter(function(record) {
-        var recordDate = new Date(record.timestamp).toDateString();
+        const recordDate = new Date(record.timestamp).toDateString();
         return recordDate === today;
     });
 }
@@ -91,7 +82,7 @@ function getTodayRecords() {
 function addRecord(type) {
     console.log('Adicionando registro do tipo:', type);
     
-    var newRecord = {
+    const newRecord = {
         id: Date.now().toString(),
         type: type,
         timestamp: new Date().toISOString()
@@ -108,8 +99,8 @@ function addRecord(type) {
 function removeLastRecord(type) {
     console.log('Removendo último registro do tipo:', type);
     
-    var todayRecords = getTodayRecords();
-    var typeRecords = todayRecords.filter(function(record) {
+    const todayRecords = getTodayRecords();
+    const typeRecords = todayRecords.filter(function(record) {
         return record.type === type;
     });
     
@@ -120,7 +111,7 @@ function removeLastRecord(type) {
     }
     
     // Pegar o último registro deste tipo (mais recente)
-    var lastRecord = typeRecords.sort(function(a, b) {
+    const lastRecord = typeRecords.sort(function(a, b) {
         return new Date(b.timestamp) - new Date(a.timestamp);
     })[0];
     
@@ -161,75 +152,73 @@ function clearAllRecords() {
 // INTERFACE E EVENTOS
 // ======================
 function updateCurrentDate() {
-    var dateElement = document.getElementById('currentDate');
+    const dateElement = document.getElementById('currentDate');
     if (dateElement) {
-        var options = { 
+        const options = { 
             weekday: 'long', 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
         };
-        var currentDate = new Date().toLocaleDateString('pt-BR', options);
+        const currentDate = new Date().toLocaleDateString('pt-BR', options);
         dateElement.textContent = currentDate;
     }
 }
 
 function bindEvents() {
     // Eventos dos botões de contador (adicionar)
-    var counterBtns = document.querySelectorAll('.counter-btn');
+    const counterBtns = document.querySelectorAll('.counter-btn');
     console.log('Vinculando eventos aos botões de contador:', counterBtns.length);
     
-    for (var i = 0; i < counterBtns.length; i++) {
-        counterBtns[i].addEventListener('click', function(e) {
+    counterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            var type = this.getAttribute('data-type');
+            const type = this.getAttribute('data-type');
             console.log('Clique no botão contador:', type);
             addRecord(type);
             
             // Animação de feedback
-            var btn = this;
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(function() {
-                btn.style.transform = '';
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
             }, 150);
         });
-    }
+    });
 
     // Eventos dos botões de reduzir
-    var reduceBtns = document.querySelectorAll('.reduce-btn');
+    const reduceBtns = document.querySelectorAll('.reduce-btn');
     console.log('Vinculando eventos aos botões de redução:', reduceBtns.length);
     
-    for (var i = 0; i < reduceBtns.length; i++) {
-        reduceBtns[i].addEventListener('click', function(e) {
+    reduceBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            var type = this.getAttribute('data-type');
+            const type = this.getAttribute('data-type');
             console.log('Clique no botão redução:', type);
             removeLastRecord(type);
             
             // Animação de feedback
-            var btn = this;
-            btn.style.transform = 'scale(0.9)';
-            setTimeout(function() {
-                btn.style.transform = '';
+            this.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                this.style.transform = '';
             }, 150);
         });
-    }
+    });
 
     // Eventos das tabs
-    var tabBtns = document.querySelectorAll('.tab-btn');
-    for (var i = 0; i < tabBtns.length; i++) {
-        tabBtns[i].addEventListener('click', function(e) {
-            var tab = e.currentTarget.dataset.tab;
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            const tab = e.currentTarget.dataset.tab;
             switchTab(tab);
         });
-    }
+    });
 
     // Campo nome do operador
-    var operatorInput = document.getElementById('operatorName');
+    const operatorInput = document.getElementById('operatorName');
     if (operatorInput) {
         operatorInput.addEventListener('input', function(e) {
             saveOperatorName(e.target.value);
@@ -237,7 +226,7 @@ function bindEvents() {
     }
 
     // Botão limpar tudo
-    var clearBtn = document.getElementById('clearAllBtn');
+    const clearBtn = document.getElementById('clearAllBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
             clearAllRecords();
@@ -245,7 +234,7 @@ function bindEvents() {
     }
 
     // Botão exportar
-    var exportBtn = document.getElementById('exportBtn');
+    const exportBtn = document.getElementById('exportBtn');
     if (exportBtn) {
         exportBtn.addEventListener('click', function() {
             exportSummaryAsImage();
@@ -253,9 +242,9 @@ function bindEvents() {
     }
 
     // Eventos do modal
-    var modalCancel = document.getElementById('modalCancel');
-    var modalConfirm = document.getElementById('modalConfirm');
-    var modalOverlay = document.getElementById('modalOverlay');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
+    const modalOverlay = document.getElementById('modalOverlay');
     
     if (modalCancel) {
         modalCancel.addEventListener('click', function() {
@@ -287,7 +276,7 @@ function bindEvents() {
         }
         
         if (['1', '2', '3', '4'].indexOf(e.key) !== -1 && activeTab === 'counter') {
-            var types = ['B', 'T0', 'T1', 'T2'];
+            const types = ['B', 'T0', 'T1', 'T2'];
             addRecord(types[parseInt(e.key) - 1]);
         }
     });
@@ -300,21 +289,21 @@ function switchTab(tab) {
     activeTab = tab;
     
     // Atualizar botões
-    var tabBtns = document.querySelectorAll('.tab-btn');
-    for (var i = 0; i < tabBtns.length; i++) {
-        tabBtns[i].classList.remove('active');
-    }
-    var activeBtn = document.querySelector('[data-tab="' + tab + '"]');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.querySelector('[data-tab="' + tab + '"]');
     if (activeBtn) {
         activeBtn.classList.add('active');
     }
     
     // Atualizar conteúdo
-    var tabContents = document.querySelectorAll('.tab-content');
-    for (var i = 0; i < tabContents.length; i++) {
-        tabContents[i].classList.remove('active');
-    }
-    var activeContent = document.getElementById(tab + 'Tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(function(content) {
+        content.classList.remove('active');
+    });
+    const activeContent = document.getElementById(tab + 'Tab');
     if (activeContent) {
         activeContent.classList.add('active');
     }
@@ -342,10 +331,10 @@ function updateDisplay() {
 }
 
 function updateCounterDisplay() {
-    var todayRecords = getTodayRecords();
+    const todayRecords = getTodayRecords();
     
     // Contar por tipo
-    var counts = {
+    const counts = {
         B: todayRecords.filter(function(r) { return r.type === 'B'; }).length,
         T0: todayRecords.filter(function(r) { return r.type === 'T0'; }).length,
         T1: todayRecords.filter(function(r) { return r.type === 'T1'; }).length,
@@ -353,40 +342,39 @@ function updateCounterDisplay() {
     };
     
     // Atualizar contadores
-    var types = Object.keys(counts);
-    for (var i = 0; i < types.length; i++) {
-        var type = types[i];
-        var countElement = document.getElementById('count' + type);
-        var totalElement = document.getElementById('total' + type);
+    const types = Object.keys(counts);
+    types.forEach(function(type) {
+        const countElement = document.getElementById('count' + type);
+        const totalElement = document.getElementById('total' + type);
         
         if (countElement) countElement.textContent = counts[type];
         if (totalElement) totalElement.textContent = counts[type];
-    }
+    });
     
     // Total geral
-    var grandTotal = todayRecords.length;
-    var grandTotalElement = document.getElementById('grandTotal');
+    const grandTotal = todayRecords.length;
+    const grandTotalElement = document.getElementById('grandTotal');
     if (grandTotalElement) {
         grandTotalElement.textContent = grandTotal;
     }
 }
 
 function updateHistoryCount() {
-    var todayRecords = getTodayRecords();
-    var countElement = document.getElementById('historyCount');
+    const todayRecords = getTodayRecords();
+    const countElement = document.getElementById('historyCount');
     if (countElement) {
         countElement.textContent = '(' + todayRecords.length + ')';
     }
 }
 
 function updateHistoryDisplay() {
-    var todayRecords = getTodayRecords();
-    var historyList = document.getElementById('historyList');
-    var emptyHistory = document.getElementById('emptyHistory');
-    var historyDescription = document.getElementById('historyDescription');
+    const todayRecords = getTodayRecords();
+    const historyList = document.getElementById('historyList');
+    const emptyHistory = document.getElementById('emptyHistory');
+    const historyDescription = document.getElementById('historyDescription');
     
     // Atualizar descrição
-    var count = todayRecords.length;
+    const count = todayRecords.length;
     if (historyDescription) {
         historyDescription.textContent = count + ' descida' + (count !== 1 ? 's' : '') + ' registrada' + (count !== 1 ? 's' : '');
     }
@@ -401,22 +389,21 @@ function updateHistoryDisplay() {
     if (emptyHistory) emptyHistory.style.display = 'none';
     
     // Ordenar por data (mais recente primeiro)
-    var sortedRecords = todayRecords.slice().sort(function(a, b) {
+    const sortedRecords = todayRecords.slice().sort(function(a, b) {
         return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
     
     // Gerar HTML
-    var html = '';
-    for (var i = 0; i < sortedRecords.length; i++) {
-        var record = sortedRecords[i];
-        var emoji = getTypeEmoji(record.type);
-        var color = getTypeColor(record.type);
-        var time = new Date(record.timestamp).toLocaleTimeString('pt-BR', {
+    let html = '';
+    sortedRecords.forEach(function(record, index) {
+        const emoji = getTypeEmoji(record.type);
+        const color = getTypeColor(record.type);
+        const time = new Date(record.timestamp).toLocaleTimeString('pt-BR', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit'
         });
-        var number = sortedRecords.length - i;
+        const number = sortedRecords.length - index;
         
         html += '<div class="history-item">' +
             '<div class="history-item-content">' +
@@ -433,7 +420,7 @@ function updateHistoryDisplay() {
                 '🗑️' +
             '</button>' +
         '</div>';
-    }
+    });
     
     if (historyList) {
         historyList.innerHTML = html;
@@ -441,10 +428,10 @@ function updateHistoryDisplay() {
 }
 
 function updateSummaryDisplay() {
-    var todayRecords = getTodayRecords();
-    var summaryContent = document.getElementById('summaryContent');
-    var emptySummary = document.getElementById('emptySummary');
-    var exportBtn = document.getElementById('exportBtn');
+    const todayRecords = getTodayRecords();
+    const summaryContent = document.getElementById('summaryContent');
+    const emptySummary = document.getElementById('emptySummary');
+    const exportBtn = document.getElementById('exportBtn');
     
     if (todayRecords.length === 0) {
         if (summaryContent) summaryContent.style.display = 'none';
@@ -463,7 +450,7 @@ function updateSummaryDisplay() {
 }
 
 function generateSummaryHTML(records) {
-    var counts = {
+    const counts = {
         B: records.filter(function(r) { return r.type === 'B'; }).length,
         T0: records.filter(function(r) { return r.type === 'T0'; }).length,
         T1: records.filter(function(r) { return r.type === 'T1'; }).length,
@@ -471,14 +458,14 @@ function generateSummaryHTML(records) {
     };
     
     // Primeira e última descida
-    var sortedRecords = records.slice().sort(function(a, b) {
+    const sortedRecords = records.slice().sort(function(a, b) {
         return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     });
-    var first = sortedRecords[0];
-    var last = sortedRecords[sortedRecords.length - 1];
+    const first = sortedRecords[0];
+    const last = sortedRecords[sortedRecords.length - 1];
     
     // Dados por hora
-    var hourlyData = getHourlyData(records);
+    const hourlyData = getHourlyData(records);
     
     return '<div class="summary-header">' +
             '<h2 class="summary-title">📊 Resumo do Dia</h2>' +
@@ -547,13 +534,12 @@ function generateSummaryHTML(records) {
 }
 
 function generateHourlyChartHTML(hourlyData) {
-    var maxCount = Math.max.apply(Math, hourlyData.map(function(item) { return item[1]; }));
+    const maxCount = Math.max.apply(Math, hourlyData.map(function(item) { return item[1]; }));
     
-    var html = '';
-    for (var i = 0; i < hourlyData.length; i++) {
-        var item = hourlyData[i];
-        var hour = item[0];
-        var count = item[1];
+    let html = '';
+    hourlyData.forEach(function(item) {
+        const hour = item[0];
+        const count = item[1];
         html += '<div class="chart-bar">' +
             '<div class="chart-time">' + hour + '</div>' +
             '<div class="chart-bar-container">' +
@@ -562,7 +548,7 @@ function generateHourlyChartHTML(hourlyData) {
                 '</div>' +
             '</div>' +
         '</div>';
-    }
+    });
     
     return '<div class="hourly-chart">' +
         '<h3>Descidas por Hora</h3>' +
@@ -571,23 +557,21 @@ function generateHourlyChartHTML(hourlyData) {
 }
 
 function getHourlyData(records) {
-    var hourlyCount = {};
+    const hourlyCount = {};
     
-    for (var i = 0; i < records.length; i++) {
-        var record = records[i];
-        var hour = new Date(record.timestamp).getHours();
-        var hourKey = hour.toString();
+    records.forEach(function(record) {
+        const hour = new Date(record.timestamp).getHours();
+        let hourKey = hour.toString();
         if (hourKey.length === 1) hourKey = '0' + hourKey;
         hourKey += ':00';
         hourlyCount[hourKey] = (hourlyCount[hourKey] || 0) + 1;
-    }
+    });
     
-    var result = [];
-    var keys = Object.keys(hourlyCount);
-    for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
+    const result = [];
+    const keys = Object.keys(hourlyCount);
+    keys.forEach(function(key) {
         result.push([key, hourlyCount[key]]);
-    }
+    });
     
     result.sort(function(a, b) {
         return a[0].localeCompare(b[0]);
@@ -600,7 +584,7 @@ function getHourlyData(records) {
 // FUNÇÕES AUXILIARES
 // ======================
 function getTypeEmoji(type) {
-    var emojis = {
+    const emojis = {
         'B': '🟢',
         'T0': '🔵',
         'T1': '🟡',
@@ -610,7 +594,7 @@ function getTypeEmoji(type) {
 }
 
 function getTypeColor(type) {
-    var colors = {
+    const colors = {
         'B': 'green',
         'T0': 'blue',
         'T1': 'yellow',
@@ -624,15 +608,15 @@ function getTypeColor(type) {
 // ======================
 function showConfirmModal(message, callback) {
     modalCallback = callback;
-    var modalMessage = document.getElementById('modalMessage');
-    var modalOverlay = document.getElementById('modalOverlay');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalOverlay = document.getElementById('modalOverlay');
     
     if (modalMessage) modalMessage.textContent = message;
     if (modalOverlay) modalOverlay.classList.add('active');
 }
 
 function hideModal() {
-    var modalOverlay = document.getElementById('modalOverlay');
+    const modalOverlay = document.getElementById('modalOverlay');
     if (modalOverlay) modalOverlay.classList.remove('active');
     modalCallback = null;
 }
@@ -641,7 +625,7 @@ function hideModal() {
 // SISTEMA DE NOTIFICAÇÕES
 // ======================
 function showNotification(message) {
-    var notification = document.createElement('div');
+    const notification = document.createElement('div');
     notification.style.cssText = 
         'position: fixed;' +
         'top: 20px;' +
@@ -672,17 +656,17 @@ function showNotification(message) {
 // EXPORTAÇÃO DE IMAGEM
 // ======================
 function exportSummaryAsImage() {
-    var records = getTodayRecords();
+    const records = getTodayRecords();
     
     if (records.length === 0) {
         alert('Não há dados para exportar. Registre algumas descidas primeiro.');
         return;
     }
     
-    var exportBtn = document.getElementById('exportBtn');
+    const exportBtn = document.getElementById('exportBtn');
     if (!exportBtn) return;
     
-    var originalHTML = exportBtn.innerHTML;
+    const originalHTML = exportBtn.innerHTML;
     
     exportBtn.innerHTML = '<div class="loading"><div class="spinner"></div><span>Exportando...</span></div>';
     exportBtn.disabled = true;
@@ -702,8 +686,8 @@ function exportSummaryAsImage() {
 }
 
 function simulateImageExport() {
-    var date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-    var filename = 'tirolesa-resumo-' + date + (operatorName ? '-' + operatorName.replace(/\s+/g, '-') : '') + '.png';
+    const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const filename = 'tirolesa-resumo-' + date + (operatorName ? '-' + operatorName.replace(/\s+/g, '-') : '') + '.png';
     
     console.log('Simulando download de: ' + filename);
     alert('Em uma implementação real, seria baixado o arquivo: ' + filename);
@@ -712,7 +696,7 @@ function simulateImageExport() {
 // ======================
 // CSS PARA ANIMAÇÕES
 // ======================
-var style = document.createElement('style');
+const style = document.createElement('style');
 style.textContent = 
     '@keyframes slideInRight {' +
         'from { transform: translateX(100%); opacity: 0; }' +
