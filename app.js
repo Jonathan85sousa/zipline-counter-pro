@@ -1,6 +1,6 @@
 
 // Sistema de Contagem de Descidas de Tirolesa
-// Versão em JavaScript Puro
+// JavaScript Puro - Versão Completa
 
 class TirolesaCounter {
     constructor() {
@@ -603,6 +603,14 @@ class TirolesaCounter {
                 );
             });
         }
+
+        // Botão de exportar
+        const exportBtn = document.getElementById('exportBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                this.exportSummaryAsImage();
+            });
+        }
     }
 
     bindModalEvents() {
@@ -695,7 +703,7 @@ class TirolesaCounter {
     }
 }
 
-// CSS para animações (adicionado dinamicamente)
+// CSS para animações
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideInRight {
@@ -714,19 +722,6 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new TirolesaCounter();
 });
-
-// Funções globais para compatibilidade com HTML
-function deleteRecord(id) {
-    if (app) {
-        app.deleteRecordAndUpdate(id);
-    }
-}
-
-function exportSummaryAsImage() {
-    if (app) {
-        app.exportSummaryAsImage();
-    }
-}
 
 // Tratamento de erros
 window.addEventListener('error', (event) => {
