@@ -1,6 +1,6 @@
 
 // Sistema de Contagem de Descidas de Tirolesa
-// JavaScript Puro - Versão Completa
+// JavaScript Puro - Versão Limpa e Otimizada
 
 class TirolesaCounter {
     constructor() {
@@ -15,17 +15,12 @@ class TirolesaCounter {
     init() {
         console.log('🏔️ Inicializando Contador de Descidas');
         
-        // Carregar dados salvos
         this.loadData();
-        
-        // Configurar interface
         this.updateCurrentDate();
         this.bindEvents();
         this.updateDisplay();
         
         console.log('✅ Sistema inicializado com sucesso!');
-        console.log('🔧 Atalhos: 1-4 para adicionar descidas, ESC para fechar modal');
-        console.log('💾 Dados salvos automaticamente no navegador');
     }
 
     // ==================
@@ -101,12 +96,10 @@ class TirolesaCounter {
             return false;
         }
         
-        // Pegar o último registro deste tipo (mais recente)
         const lastRecord = typeRecords.sort((a, b) => 
             new Date(b.timestamp) - new Date(a.timestamp)
         )[0];
         
-        // Remover o registro
         this.records = this.records.filter(record => record.id !== lastRecord.id);
         
         this.saveRecords();
@@ -145,7 +138,6 @@ class TirolesaCounter {
     switchTab(tab) {
         this.activeTab = tab;
         
-        // Atualizar botões
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
         });
@@ -154,7 +146,6 @@ class TirolesaCounter {
             activeBtn.classList.add('active');
         }
         
-        // Atualizar conteúdo
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
@@ -163,7 +154,6 @@ class TirolesaCounter {
             activeContent.classList.add('active');
         }
 
-        // Atualizar dados específicos
         if (tab === 'history') {
             this.updateHistoryDisplay();
         } else if (tab === 'summary') {
@@ -253,7 +243,6 @@ class TirolesaCounter {
     updateCounterDisplay() {
         const todayRecords = this.getTodayRecords();
         
-        // Contar por tipo
         const counts = {
             B: todayRecords.filter(r => r.type === 'B').length,
             T0: todayRecords.filter(r => r.type === 'T0').length,
@@ -261,7 +250,6 @@ class TirolesaCounter {
             T2: todayRecords.filter(r => r.type === 'T2').length
         };
         
-        // Atualizar contadores
         Object.keys(counts).forEach(type => {
             const countElement = document.getElementById('count' + type);
             const totalElement = document.getElementById('total' + type);
@@ -270,7 +258,6 @@ class TirolesaCounter {
             if (totalElement) totalElement.textContent = counts[type];
         });
         
-        // Total geral
         const grandTotal = todayRecords.length;
         const grandTotalElement = document.getElementById('grandTotal');
         if (grandTotalElement) {
@@ -292,7 +279,6 @@ class TirolesaCounter {
         const emptyHistory = document.getElementById('emptyHistory');
         const historyDescription = document.getElementById('historyDescription');
         
-        // Atualizar descrição
         const count = todayRecords.length;
         if (historyDescription) {
             historyDescription.textContent = `${count} descida${count !== 1 ? 's' : ''} registrada${count !== 1 ? 's' : ''}`;
@@ -307,12 +293,10 @@ class TirolesaCounter {
         if (historyList) historyList.style.display = 'block';
         if (emptyHistory) emptyHistory.style.display = 'none';
         
-        // Ordenar por data (mais recente primeiro)
         const sortedRecords = todayRecords.slice().sort((a, b) => 
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         );
         
-        // Gerar HTML
         let html = '';
         sortedRecords.forEach((record, index) => {
             const emoji = this.getTypeEmoji(record.type);
@@ -378,14 +362,12 @@ class TirolesaCounter {
             T2: records.filter(r => r.type === 'T2').length
         };
         
-        // Primeira e última descida
         const sortedRecords = records.slice().sort((a, b) => 
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
         const first = sortedRecords[0];
         const last = sortedRecords[sortedRecords.length - 1];
         
-        // Dados por hora
         const hourlyData = this.getHourlyData(records);
         
         return `
@@ -519,7 +501,6 @@ class TirolesaCounter {
     }
 
     bindCounterEvents() {
-        // Eventos dos botões de contador (adicionar)
         const counterBtns = document.querySelectorAll('.counter-btn');
         console.log('Vinculando eventos aos botões de contador:', counterBtns.length);
         
@@ -535,7 +516,6 @@ class TirolesaCounter {
                 this.updateDisplay();
                 this.showNotification(`Descida ${type} registrada!`);
                 
-                // Animação de feedback
                 btn.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     btn.style.transform = '';
@@ -543,7 +523,6 @@ class TirolesaCounter {
             });
         });
 
-        // Eventos dos botões de reduzir
         const reduceBtns = document.querySelectorAll('.reduce-btn');
         console.log('Vinculando eventos aos botões de redução:', reduceBtns.length);
         
@@ -563,7 +542,6 @@ class TirolesaCounter {
                     this.showNotification(`Nenhuma descida ${type} para remover`);
                 }
                 
-                // Animação de feedback
                 btn.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     btn.style.transform = '';
@@ -583,7 +561,6 @@ class TirolesaCounter {
     }
 
     bindFormEvents() {
-        // Campo nome do operador
         const operatorInput = document.getElementById('operatorName');
         if (operatorInput) {
             operatorInput.addEventListener('input', (e) => {
@@ -591,7 +568,6 @@ class TirolesaCounter {
             });
         }
 
-        // Botão limpar tudo
         const clearBtn = document.getElementById('clearAllBtn');
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
@@ -606,7 +582,6 @@ class TirolesaCounter {
             });
         }
 
-        // Botão de exportar
         const exportBtn = document.getElementById('exportBtn');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => {
@@ -670,7 +645,6 @@ class TirolesaCounter {
         this.showNotification('Registro excluído!');
     }
 
-    // Função de exportação corrigida usando html2canvas via CDN
     async exportSummaryAsImage() {
         const records = this.getTodayRecords();
         
@@ -688,7 +662,6 @@ class TirolesaCounter {
         exportBtn.disabled = true;
         
         try {
-            // Carregar html2canvas dinamicamente se não estiver disponível
             if (typeof html2canvas === 'undefined') {
                 await this.loadHtml2Canvas();
             }
@@ -698,10 +671,8 @@ class TirolesaCounter {
                 throw new Error('Elemento de resumo não encontrado');
             }
 
-            // Aguardar um breve momento para garantir que o DOM está renderizado
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Gerar o canvas
             const canvas = await html2canvas(element, {
                 backgroundColor: '#ffffff',
                 scale: 2,
@@ -714,7 +685,6 @@ class TirolesaCounter {
                 height: element.scrollHeight
             });
 
-            // Converter canvas para blob e fazer download
             canvas.toBlob((blob) => {
                 if (!blob) {
                     throw new Error('Erro ao gerar imagem');
@@ -745,7 +715,6 @@ class TirolesaCounter {
         }
     }
 
-    // Carregar html2canvas dinamicamente
     loadHtml2Canvas() {
         return new Promise((resolve, reject) => {
             if (typeof html2canvas !== 'undefined') {
