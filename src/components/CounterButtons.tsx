@@ -5,10 +5,15 @@ import { DescentRecord } from '../pages/Index';
 interface CounterButtonsProps {
   onAddRecord: (type: 'B' | 'T0' | 'T1' | 'T2') => void;
   todayRecords: DescentRecord[];
+  counts?: Record<string, number>;
 }
 
-export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, todayRecords }) => {
+export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, todayRecords, counts }) => {
   const getCountByType = (type: 'B' | 'T0' | 'T1' | 'T2') => {
+    // Use counts from Supabase if available, otherwise fall back to local counting
+    if (counts) {
+      return counts[type] || 0;
+    }
     return todayRecords.filter(record => record.type === type).length;
   };
 
@@ -18,6 +23,10 @@ export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, tod
     { type: 'T1' as const, color: 'bg-yellow-500 hover:bg-yellow-600', label: 'Cadeirinha T1', emoji: '🟡' },
     { type: 'T2' as const, color: 'bg-red-500 hover:bg-red-600', label: 'Cadeirinha T2', emoji: '🔴' },
   ];
+
+  const totalCount = counts 
+    ? Object.values(counts).reduce((sum, count) => sum + count, 0)
+    : todayRecords.length;
 
   return (
     <div className="space-y-6">
@@ -59,7 +68,7 @@ export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, tod
         </div>
         <div className="mt-4 pt-4 border-t text-center">
           <div className="text-sm text-muted-foreground">Total Geral</div>
-          <div className="text-2xl font-bold text-primary">{todayRecords.length}</div>
+          <div className="text-2xl font-bold text-primary">{totalCount}</div>
         </div>
       </div>
     </div>

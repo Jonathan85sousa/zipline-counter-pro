@@ -1,11 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CounterButtons } from '../components/CounterButtons';
 import { HistoryList } from '../components/HistoryList';
 import { DaySummary } from '../components/DaySummary';
 import { ExportButton } from '../components/ExportButton';
 import { Header } from '../components/Header';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSupabaseCounters } from '../hooks/useSupabaseCounters';
 
 export interface DescentRecord {
   id: string;
@@ -14,45 +15,65 @@ export interface DescentRecord {
 }
 
 const Index = () => {
-  const [records, setRecords] = useLocalStorage<DescentRecord[]>('tirolesa-records', []);
   const [activeTab, setActiveTab] = useState<'counter' | 'history' | 'summary'>('counter');
   const [operatorName, setOperatorName] = useLocalStorage<string>('operator-name', '');
+  
+  const {
+    counts,
+    records,
+    isLoading,
+    isConnected,
+    addRecord,
+    deleteRecord,
+    clearAllRecords
+  } = useSupabaseCounters(operatorName);
 
-  const addRecord = (type: 'B' | 'T0' | 'T1' | 'T2') => {
-    const newRecord: DescentRecord = {
-      id: Date.now().toString(),
-      type,
-      timestamp: new Date()
-    };
-    setRecords(prev => [...prev, newRecord]);
-  };
+  // Convert Supabase records to local format for compatibility
+  const todayRecords: DescentRecord[] = records.map(record => ({
+    id: record.id,
+    type: record.type as 'B' | 'T0' | 'T1' | 'T2',
+    timestamp: new Date(record.timestamp)
+  }));
 
-  const deleteRecord = (id: string) => {
-    setRecords(prev => prev.filter(record => record.id !== id));
-  };
+  const getTodayRecords = () => todayRecords;
 
-  const clearAllRecords = () => {
+  const handleClearAll = () => {
     if (window.confirm('Tem certeza que deseja zerar todas as contagens? Esta ação não pode ser desfeita.')) {
-      setRecords([]);
+      clearAllRecords();
     }
   };
 
-  const getTodayRecords = () => {
-    const today = new Date().toDateString();
-    return records.filter(record => 
-      new Date(record.timestamp).toDateString() === today
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⏳</div>
+          <div className="text-xl font-semibold">Carregando...</div>
+        </div>
+      </div>
     );
-  };
-
-  const todayRecords = getTodayRecords();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       <Header 
         operatorName={operatorName} 
         setOperatorName={setOperatorName}
-        onClearAll={clearAllRecords}
+        onClearAll={handleClearAll}
       />
+      
+      {/* Connection Status */}
+      <div className="container mx-auto px-4 py-2">
+        <div className="flex justify-center">
+          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+            isConnected 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {isConnected ? '🟢 Conectado em tempo real' : '🔴 Desconectado'}
+          </div>
+        </div>
+      </div>
       
       <div className="container mx-auto px-4 py-6">
         {/* Navigation Tabs */}
@@ -91,7 +112,11 @@ const Index = () => {
 
         {/* Tab Content */}
         {activeTab === 'counter' && (
-          <CounterButtons onAddRecord={addRecord} todayRecords={todayRecords} />
+          <CounterButtons 
+            onAddRecord={addRecord} 
+            todayRecords={todayRecords}
+            counts={counts}
+          />
         )}
 
         {activeTab === 'history' && (

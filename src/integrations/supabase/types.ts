@@ -9,13 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      descent_counts: {
+        Row: {
+          count: number
+          created_at: string
+          date: string
+          id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      descent_records: {
+        Row: {
+          date: string
+          id: string
+          operator_name: string | null
+          timestamp: string
+          type: string
+        }
+        Insert: {
+          date?: string
+          id?: string
+          operator_name?: string | null
+          timestamp?: string
+          type: string
+        }
+        Update: {
+          date?: string
+          id?: string
+          operator_name?: string | null
+          timestamp?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      initialize_daily_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
