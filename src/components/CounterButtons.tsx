@@ -17,6 +17,11 @@ export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, tod
     return todayRecords.filter(record => record.type === type).length;
   };
 
+  const handleButtonClick = (type: 'B' | 'T0' | 'T1' | 'T2') => {
+    console.log('🔘 Botão clicado:', type);
+    onAddRecord(type);
+  };
+
   const buttonConfigs = [
     { type: 'B' as const, color: 'bg-green-500 hover:bg-green-600', label: 'Cadeirinha B', emoji: '🟢' },
     { type: 'T0' as const, color: 'bg-blue-500 hover:bg-blue-600', label: 'Cadeirinha T0', emoji: '🔵' },
@@ -43,8 +48,9 @@ export const CounterButtons: React.FC<CounterButtonsProps> = ({ onAddRecord, tod
         {buttonConfigs.map(({ type, color, label, emoji }) => (
           <button
             key={type}
-            onClick={() => onAddRecord(type)}
-            className={`${color} text-white p-8 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95`}
+            onClick={() => handleButtonClick(type)}
+            className={`${color} text-white p-8 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 cursor-pointer`}
+            style={{ userSelect: 'none' }}
           >
             <div className="text-6xl mb-4">{emoji}</div>
             <div className="text-xl font-bold mb-2">{label}</div>
